@@ -196,9 +196,9 @@ extension TasksVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let destVC = DetailedTask()
         if isSearching {
-            destVC.amendedTask = filteredTodos[indexPath.row]
+            destVC.choosedTask = filteredTodos[indexPath.row]
         } else {
-            destVC.amendedTask = todos[indexPath.row]
+            destVC.choosedTask = todos[indexPath.row]
         }
         navigationController?.pushViewController(destVC, animated: true)
     }
@@ -208,9 +208,9 @@ extension TasksVC: UITableViewDelegate, UITableViewDataSource {
             let edit = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { action in
                 let destVC = DetailedTask()
                 if self.isSearching {
-                    destVC.amendedTask = self.filteredTodos[indexPath.row]
+                    destVC.choosedTask = self.filteredTodos[indexPath.row]
                 } else {
-                    destVC.amendedTask = self.todos[indexPath.row]
+                    destVC.choosedTask = self.todos[indexPath.row]
                 }
                 self.navigationController?.pushViewController(destVC, animated: true)
             }
@@ -235,6 +235,25 @@ extension TasksVC: UITableViewDelegate, UITableViewDataSource {
             }
             return UIMenu(title: "", children: [edit, share, delete])
         }
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        guard editingStyle == .delete else { return }
+        
+        if self.isSearching {
+            CoreDataManager.shared.deleteTodo(todo: self.filteredTodos[indexPath.row]) { error in
+                print(error?.rawValue ?? "error")
+            }
+            self.filteredTodos.remove(at: indexPath.row)
+            self.updateUI(todos: self.filteredTodos)
+        } else {
+            CoreDataManager.shared.deleteTodo(todo: self.todos[indexPath.row]) { error in
+                print(error?.rawValue ?? "error")
+            }
+            self.todos.remove(at: indexPath.row)
+            self.updateUI(todos: self.todos)
+        }
+        self.tasksTableView.deleteRows(at: [indexPath], with: .automatic)
     }
     
     

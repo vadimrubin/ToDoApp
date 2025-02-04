@@ -11,12 +11,12 @@ class DetailedTask: UIViewController {
     
     var dateLabel = UILabel()
     var descriptionTextField = UITextView()
-    var amendedTask: ToDo?
+    var choosedTask: ToDo?
     let dateFormatter = DateFormatter()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = amendedTask?.title
+        title = choosedTask?.title
         view.backgroundColor = .systemBackground
         configureDateLabel()
         configureDescriptionTextField()
@@ -29,7 +29,7 @@ class DetailedTask: UIViewController {
         dateLabel.font = .systemFont(ofSize: 12, weight: .regular)
         dateLabel.textColor = .label
         dateLabel.translatesAutoresizingMaskIntoConstraints = false
-        dateLabel.text = amendedTask?.date?.convertToMonthYearFormat()
+        dateLabel.text = choosedTask?.date?.convertToMonthYearFormat()
         
         NSLayoutConstraint.activate([
             dateLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -46,7 +46,7 @@ class DetailedTask: UIViewController {
         descriptionTextField.textColor = .label
         descriptionTextField.textAlignment = .natural
         descriptionTextField.isEditable = true
-        descriptionTextField.text = amendedTask?.taskDescription
+        descriptionTextField.text = choosedTask?.taskDescription
         
         NSLayoutConstraint.activate([
             descriptionTextField.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 15),
@@ -62,7 +62,7 @@ class DetailedTask: UIViewController {
     
     @objc func backAction(sender: UIBarButtonItem) {
         
-        amendedTask?.taskDescription = descriptionTextField.text
+        choosedTask?.taskDescription = descriptionTextField.text
         CoreDataManager.shared.saveAmendedTodo()
         
         self.navigationController?.popViewController(animated: true)
