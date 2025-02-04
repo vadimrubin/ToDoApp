@@ -9,19 +9,27 @@ import UIKit
 
 class DetailedTask: UIViewController {
     
-    var dateLabel = TDDateLabel()
-    var descriptionTextField = UITextField()
+    var dateLabel = UILabel()
+    var descriptionTextField = UITextView()
+    var amendedTask: ToDo?
+    let dateFormatter = DateFormatter()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = amendedTask?.title
         view.backgroundColor = .systemBackground
         configureDateLabel()
-        configureDescriptionLabel()
+        configureDescriptionTextField()
         configureBackBatItem()
     }
     
     func configureDateLabel() {
         view.addSubview(dateLabel)
+        
+        dateLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        dateLabel.textColor = .label
+        dateLabel.translatesAutoresizingMaskIntoConstraints = false
+        dateLabel.text = amendedTask?.date?.convertToMonthYearFormat()
         
         NSLayoutConstraint.activate([
             dateLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -31,13 +39,14 @@ class DetailedTask: UIViewController {
         ])
     }
     
-    func configureDescriptionLabel() {
+    func configureDescriptionTextField() {
         view.addSubview(descriptionTextField)
         descriptionTextField.translatesAutoresizingMaskIntoConstraints = false
         descriptionTextField.font = .systemFont(ofSize: 14, weight: .regular)
         descriptionTextField.textColor = .label
-        descriptionTextField.contentVerticalAlignment = .top
         descriptionTextField.textAlignment = .natural
+        descriptionTextField.isEditable = true
+        descriptionTextField.text = amendedTask?.taskDescription
         
         NSLayoutConstraint.activate([
             descriptionTextField.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 15),
@@ -48,9 +57,16 @@ class DetailedTask: UIViewController {
     }
     
     func configureBackBatItem() {
-        let backButton = UIBarButtonItem()
-        backButton.title = "Назад"
-        self.navigationController?.navigationBar.topItem?.backBarButtonItem = backButton
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "< Назад", style: .plain, target: self, action: #selector(backAction))
     }
-
+    
+    @objc func backAction(sender: UIBarButtonItem) {
+        
+        amendedTask?.taskDescription = descriptionTextField.text
+        CoreDataManager.shared.saveAmendedTodo()
+        
+        self.navigationController?.popViewController(animated: true)
+    }
+    
 }
+
